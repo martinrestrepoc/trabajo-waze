@@ -1,0 +1,20 @@
+[project]
+name = "trabajo-waze"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "geopandas",
+    "geopy",
+    "ipykernel",
+    "jupyterlab",
+    "matplotlib",
+    "networkx",
+    "osmnx",
+    "pandas",
+    "plotly",
+    "requests",
+    "scikit-learn",
+    "shapely",
+]
