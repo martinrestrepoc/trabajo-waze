@@ -14,6 +14,7 @@ dependencies = [
     "osmnx",
     "pandas",
     "plotly",
+    "pydot>=4.0.1",
     "requests",
     "scikit-learn",
     "shapely",
