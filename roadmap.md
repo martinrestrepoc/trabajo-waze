@@ -17,7 +17,7 @@ Sí se podrán utilizar OSMnx y NetworkX para:
 Los dos lugares fijos de la demostración serán:
 
 - origen: unidad o edificio de apartamentos Pitriza;
-- destino: Comfama La Estrella.
+- destino: corregimiento La Tablaza, La Estrella.
 
 Antes de ejecutar la búsqueda se verificarán visualmente las ubicaciones obtenidas por el geocodificador. Si alguna ubicación no es reconocida correctamente, se usarán coordenadas fijas verificadas.
 
@@ -106,7 +106,7 @@ La primera versión funcional utilizará solamente `travel_time` para `g(n)` y e
 
 ### Fase 2. Definir origen y destino
 
-- [ ] Geocodificar Pitriza y Comfama La Estrella.
+- [ ] Geocodificar Pitriza y La Tablaza.
 - [ ] Mostrar las direcciones y coordenadas encontradas.
 - [ ] Confirmar visualmente que corresponden a los lugares esperados.
 - [ ] Guardar coordenadas manuales como respaldo.
@@ -236,7 +236,7 @@ No se utilizará `nx.shortest_path` como comparación ni como mecanismo de valid
 - [ ] Resumir los tipos de vía y superficies utilizados.
 - [ ] Mostrar el número de nodos explorados por A*.
 
-**Resultado:** visualización y resumen interpretables de la ruta Pitriza–Comfama.
+**Resultado:** visualización y resumen interpretables de la ruta Pitriza–La Tablaza.
 
 ### Fase 9. Experimentos finales
 
@@ -265,7 +265,7 @@ El trabajo estará terminado cuando:
 
 - `Waze_IA.ipynb` pueda ejecutarse en orden desde el inicio hasta el final;
 - descargue o cargue la red vial de La Estrella;
-- identifique correctamente Pitriza y Comfama La Estrella;
+- identifique correctamente Pitriza y La Tablaza;
 - encuentre una ruta mediante un A* implementado por nosotros;
 - no llame a algoritmos de rutas de NetworkX;
 - mida todos los costos en segundos;
