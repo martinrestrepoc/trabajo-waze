@@ -47,9 +47,9 @@ El costo de recorrer una arista comenzará con su atributo `travel_time`, calcul
 costo_tramo =
     travel_time
     × factor_tipo_vía
-    × factor_superficie
     × factor_pendiente
-    + demora_semáforo
+    + demora_giro
+    + demora_intersección
 ```
 
 Todos los factores tendrán un valor predeterminado de `1.0`. Las penalizaciones nunca serán negativas.
@@ -66,7 +66,7 @@ h(n) = distancia_recta_en_metros × 3.6 / velocidad_máxima_en_km_h
 
 La multiplicación por `3.6` convierte el resultado a segundos. La distancia en línea recta se calculará con las coordenadas de los nodos. La velocidad de referencia será igual o superior a la mayor velocidad asignada a las vías del grafo.
 
-Esta heurística es sencilla, rápida y coherente con el objetivo de minimizar el tiempo. Los semáforos, la superficie y el tipo de vía no se incluirán directamente en `h(n)`, porque no se conoce de antemano cuáles encontrará la ruta restante. Esos atributos modificarán el costo real `g(n)` cuando se recorran las aristas.
+Esta heurística es sencilla, rápida y coherente con el objetivo de minimizar el tiempo. Los giros, las intersecciones y el tipo de vía no se incluirán directamente en `h(n)`, porque no se conoce de antemano cuáles encontrará la ruta restante. Esos elementos modificarán el costo real `g(n)` al recorrer la ruta.
 
 ### 3.3 Prioridad de A*
 
@@ -86,8 +86,8 @@ Todas las partes de `f(n)` estarán expresadas en segundos.
 | `speed_kph` | Calcular el tiempo de cada tramo | Baja | Incluir |
 | `travel_time` | Costo temporal base | Baja | Incluir |
 | `highway` | Ajustar el tiempo según el tipo de vía | Baja | Incluir |
-| Semáforos | Agregar una demora fija al atravesarlos | Media | Incluir |
-| `surface` | Penalizar superficies que reduzcan la velocidad | Media | Incluir si hay cobertura suficiente |
+| `bearing` y giros | Penalizar cambios de dirección entre aristas consecutivas | Alta | Incluir |
+| Intersecciones | Agregar una demora según `street_count` | Media | Incluir |
 | Pendiente | Ajustar el tiempo en subidas pronunciadas | Alta | Incorporar en una fase opcional |
 
 La primera versión funcional utilizará solamente `travel_time` para `g(n)` y el tiempo en línea recta para `h(n)`. Los demás atributos se incorporarán uno por uno después de comprobar que el algoritmo básico funciona.
@@ -120,8 +120,11 @@ La primera versión funcional utilizará solamente `travel_time` para `g(n)` y e
 - [ ] Definir velocidades predeterminadas por tipo de vía para los casos sin `maxspeed`.
 - [ ] Calcular `speed_kph` con `ox.add_edge_speeds`.
 - [ ] Calcular `travel_time` con `ox.add_edge_travel_times`.
-- [ ] Contar cuántas aristas contienen `length`, `speed_kph`, `travel_time`, `highway` y `surface`.
-- [ ] Contar los nodos identificados como `highway=traffic_signals`.
+- [ ] Calcular `bearing` con `ox.add_edge_bearings`.
+- [ ] Contar cuántas aristas contienen `length`, `speed_kph`, `travel_time`, `highway` y `bearing`.
+- [ ] Identificar los movimientos posibles comparando el `bearing` de aristas consecutivas.
+- [ ] Identificar intersecciones mediante `street_count >= 3`.
+- [ ] Resumir las intersecciones según la cantidad de calles conectadas.
 - [ ] Revisar los valores diferentes y los datos faltantes de cada atributo.
 - [ ] Documentar las reglas utilizadas para reemplazar valores ausentes.
 
@@ -198,10 +201,10 @@ No se utilizará `nx.shortest_path` como comparación ni como mecanismo de valid
 
 ### Fase 7. Incorporar los atributos progresivamente
 
-#### Iteración 7.1: semáforos
+#### Iteración 7.1: intersecciones
 
-- [ ] Detectar si el nodo de llegada de una arista es un semáforo.
-- [ ] Agregar una demora configurable, por ejemplo 15 o 20 segundos.
+- [ ] Detectar si el nodo de llegada tiene `street_count >= 3`.
+- [ ] Agregar una demora configurable según la cantidad de calles conectadas.
 - [ ] Comparar la ruta antes y después de la penalización.
 
 #### Iteración 7.2: tipo de vía
@@ -210,11 +213,12 @@ No se utilizará `nx.shortest_path` como comparación ni como mecanismo de valid
 - [ ] Tratar correctamente valores únicos, listas y datos faltantes.
 - [ ] Aplicar únicamente penalizaciones justificables y moderadas.
 
-#### Iteración 7.3: superficie
+#### Iteración 7.3: giros
 
-- [ ] Incorporar `surface` solamente si su cobertura en el mapa es suficiente.
-- [ ] Agrupar superficies en categorías simples: pavimentada, irregular y desconocida.
-- [ ] Evitar crear reglas para demasiados valores particulares.
+- [ ] Comparar el `bearing` de la arista de entrada con el de la arista de salida.
+- [ ] Clasificar el movimiento como recto, giro o retorno mediante umbrales configurables.
+- [ ] Ampliar el estado de A* para recordar la llegada anterior, porque el costo del giro depende de dos aristas consecutivas.
+- [ ] Agregar demoras moderadas y configurables por tipo de movimiento.
 
 #### Iteración 7.4: pendiente opcional
 
@@ -232,8 +236,9 @@ No se utilizará `nx.shortest_path` como comparación ni como mecanismo de valid
 - [ ] Crear una tabla con los tramos seleccionados y sus atributos.
 - [ ] Calcular distancia total en metros o kilómetros.
 - [ ] Calcular tiempo base y tiempo ajustado.
-- [ ] Contar semáforos atravesados.
-- [ ] Resumir los tipos de vía y superficies utilizados.
+- [ ] Contar intersecciones atravesadas.
+- [ ] Contar y resumir los giros realizados.
+- [ ] Resumir los tipos de vía utilizados.
 - [ ] Mostrar el número de nodos explorados por A*.
 
 **Resultado:** visualización y resumen interpretables de la ruta Pitriza–La Tablaza.
@@ -243,8 +248,8 @@ No se utilizará `nx.shortest_path` como comparación ni como mecanismo de valid
 Se compararán configuraciones construidas con el mismo A* propio:
 
 1. solo tiempo de viaje;
-2. tiempo más semáforos;
-3. tiempo, semáforos y tipo de vía;
+2. tiempo más intersecciones;
+3. tiempo, intersecciones y tipo de vía;
 4. configuración completa con los atributos que tengan buena cobertura.
 
 Para cada configuración se registrará:
@@ -253,7 +258,8 @@ Para cada configuración se registrará:
 - tiempo base estimado;
 - tiempo ajustado por la función de costo;
 - distancia total;
-- semáforos atravesados;
+- intersecciones atravesadas;
+- giros realizados;
 - nodos explorados;
 - duración de la búsqueda.
 
@@ -282,15 +288,16 @@ La primera entrega debería incluir:
 - velocidad estimada;
 - tiempo estimado;
 - tipo de vía;
-- semáforos;
-- superficie únicamente si existe información suficiente.
+- intersecciones;
+- giros.
 
 La pendiente se conservará como ampliación opcional. El objetivo principal es demostrar correctamente la implementación propia de A* y la minimización del tiempo estimado, antes de aumentar la complejidad del modelo.
 
 ## 8. Limitaciones conocidas
 
 - `travel_time` representa tiempo de circulación libre y no tráfico en tiempo real.
-- Las etiquetas de semáforos y superficies pueden estar incompletas.
+- `street_count` aproxima la complejidad de una intersección, pero no representa su demora real ni el nivel de tráfico.
+- La clasificación de giros depende de umbrales angulares definidos por el modelo.
 - Las velocidades faltantes serán estimadas según el tipo de vía.
 - Las penalizaciones representan supuestos del modelo y deberán explicarse.
 - La calidad de la ruta dependerá de la calidad y actualidad de los datos de OpenStreetMap.
