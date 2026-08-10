@@ -45,9 +45,7 @@ El costo de recorrer una arista comenzará con su atributo `travel_time`, calcul
 
 ```text
 costo_tramo =
-    travel_time
-    × factor_tipo_vía
-    × factor_pendiente
+    travel_time(length, speed_kph, highway)
     + demora_giro
     + demora_intersección
 ```
@@ -85,7 +83,7 @@ Todas las partes de `f(n)` estarán expresadas en segundos.
 | `length` | Calcular tiempo y distancia final | Baja | Incluir |
 | `speed_kph` | Calcular el tiempo de cada tramo | Baja | Incluir |
 | `travel_time` | Costo temporal base | Baja | Incluir |
-| `highway` | Ajustar el tiempo según el tipo de vía | Baja | Incluir |
+| `highway` | Estimar `speed_kph` cuando falta `maxspeed` | Baja | Incluir dentro de `travel_time` |
 | `bearing` y giros | Penalizar cambios de dirección entre aristas consecutivas | Alta | Incluir |
 | Intersecciones | Agregar una demora según `street_count` | Media | Incluir |
 | Pendiente | Ajustar el tiempo en subidas pronunciadas | Alta | Incorporar en una fase opcional |
@@ -209,9 +207,9 @@ No se utilizará `nx.shortest_path` como comparación ni como mecanismo de valid
 
 #### Iteración 7.2: tipo de vía
 
-- [ ] Crear un diccionario de factores por `highway`.
+- [ ] Crear un diccionario de velocidades de respaldo por `highway`.
 - [ ] Tratar correctamente valores únicos, listas y datos faltantes.
-- [ ] Aplicar únicamente penalizaciones justificables y moderadas.
+- [ ] No aplicar un factor adicional si `highway` ya determinó `speed_kph`, para evitar contar dos veces el mismo efecto.
 
 #### Iteración 7.3: giros
 
@@ -219,13 +217,6 @@ No se utilizará `nx.shortest_path` como comparación ni como mecanismo de valid
 - [ ] Clasificar el movimiento como recto, giro o retorno mediante umbrales configurables.
 - [ ] Ampliar el estado de A* para recordar la llegada anterior, porque el costo del giro depende de dos aristas consecutivas.
 - [ ] Agregar demoras moderadas y configurables por tipo de movimiento.
-
-#### Iteración 7.4: pendiente opcional
-
-- [ ] Conseguir elevaciones para los nodos mediante una fuente compatible con OSMnx.
-- [ ] Calcular `grade` para las aristas.
-- [ ] Analizar si la pendiente cambia significativamente el tiempo estimado en automóvil.
-- [ ] Incorporarla solo si mejora el modelo sin volverlo innecesariamente complejo.
 
 **Resultado:** modelo temporal configurable enriquecido con los atributos que realmente estén disponibles.
 
@@ -249,8 +240,8 @@ Se compararán configuraciones construidas con el mismo A* propio:
 
 1. solo tiempo de viaje;
 2. tiempo más intersecciones;
-3. tiempo, intersecciones y tipo de vía;
-4. configuración completa con los atributos que tengan buena cobertura.
+3. tiempo más giros;
+4. tiempo, intersecciones y giros (el tipo de vía ya participa en `travel_time`).
 
 Para cada configuración se registrará:
 
@@ -291,7 +282,7 @@ La primera entrega debería incluir:
 - intersecciones;
 - giros.
 
-La pendiente se conservará como ampliación opcional. El objetivo principal es demostrar correctamente la implementación propia de A* y la minimización del tiempo estimado, antes de aumentar la complejidad del modelo.
+El objetivo principal es demostrar correctamente la implementación propia de A* y la minimización del tiempo estimado con las variables verificadas, antes de aumentar la complejidad del modelo.
 
 ## 8. Limitaciones conocidas
 
