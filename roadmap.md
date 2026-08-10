@@ -46,6 +46,7 @@ El costo de recorrer una arista comenzará con su atributo `travel_time`, calcul
 ```text
 costo_tramo =
     travel_time(length, speed_kph, highway)
+    + ajuste_tipo_vía
     + demora_giro
     + demora_intersección
 ```
@@ -83,7 +84,7 @@ Todas las partes de `f(n)` estarán expresadas en segundos.
 | `length` | Calcular tiempo y distancia final | Baja | Incluir |
 | `speed_kph` | Calcular el tiempo de cada tramo | Baja | Incluir |
 | `travel_time` | Costo temporal base | Baja | Incluir |
-| `highway` | Estimar `speed_kph` cuando falta `maxspeed` | Baja | Incluir dentro de `travel_time` |
+| `highway` | Estimar `speed_kph` y añadir un ajuste temporal moderado por jerarquía vial | Baja | Incluir |
 | `bearing` y giros | Penalizar cambios de dirección entre aristas consecutivas | Alta | Incluir |
 | Intersecciones | Agregar una demora según `street_count` | Media | Incluir |
 | Pendiente | Ajustar el tiempo en subidas pronunciadas | Alta | Incorporar en una fase opcional |
@@ -209,7 +210,8 @@ No se utilizará `nx.shortest_path` como comparación ni como mecanismo de valid
 
 - [ ] Crear un diccionario de velocidades de respaldo por `highway`.
 - [ ] Tratar correctamente valores únicos, listas y datos faltantes.
-- [ ] No aplicar un factor adicional si `highway` ya determinó `speed_kph`, para evitar contar dos veces el mismo efecto.
+- [ ] Convertir el factor de jerarquía vial en segundos mediante `travel_time × (factor - 1)`.
+- [ ] Mantener factores moderados y documentarlos como supuestos configurables del modelo.
 
 #### Iteración 7.3: giros
 
@@ -241,7 +243,7 @@ Se compararán configuraciones construidas con el mismo A* propio:
 1. solo tiempo de viaje;
 2. tiempo más intersecciones;
 3. tiempo más giros;
-4. tiempo, intersecciones y giros (el tipo de vía ya participa en `travel_time`).
+4. tiempo, tipo de vía, intersecciones y giros.
 
 Para cada configuración se registrará:
 
