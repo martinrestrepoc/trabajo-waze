@@ -1,6 +1,9 @@
-# Trabajo Waze:
+# Trabajo Waze
 
-Este proyecto contiene notebooks para descargar y analizar la red vial de Envigado con datos de OpenStreetMap. Calcula rutas por distancia y tiempo estimado mediante OSMnx y NetworkX, y genera visualizaciones geográficas con GeoPandas, Matplotlib y Plotly.
+Este proyecto analiza la red vial de La Estrella, Antioquia, con datos de OpenStreetMap y calcula rutas mediante una implementación propia del algoritmo A*.
+
+- `Waze_IA.ipynb` implementa A* directamente en las clases `OSMRouteMap` y `CompositeOSMRouteMap`.
+- `WAZE_IA_CORRECCION.ipynb` adapta la misma búsqueda a la estructura de `Node` y `Tree`, mediante `OSMRouteNode` y `OSMRouteTree`.
 
 El entorno se administra con [uv](https://docs.astral.sh/uv/). El proyecto está fijado a Python 3.11 y las versiones reproducibles de las dependencias se encuentran en `uv.lock`.
 
@@ -90,7 +93,7 @@ El resultado debe comenzar con `Python 3.11`.
 1. Abre Visual Studio Code.
 2. Selecciona **File → Open Folder** o **Archivo → Abrir carpeta**.
 3. Abre la carpeta clonada `trabajo-waze`.
-4. Abre el notebook que quieras ejecutar, por ejemplo `Copia_de_IA_EIA_LatLong_InformacionMapa.ipynb`.
+4. Abre el notebook que quieras ejecutar, por ejemplo `Waze_IA.ipynb`.
 
 ## 5. Seleccionar el kernel correcto
 
