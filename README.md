@@ -143,3 +143,10 @@ uv sync
 ```
 
 La carpeta `.venv` es local y no debe subirse a GitHub. El archivo `uv.lock` sí debe mantenerse en el repositorio para que otros usuarios obtengan las mismas versiones de las dependencias.
+
+---
+## Referencias
+
+### Fundamento de los ajustes de tiempo
+
+Las penalizaciones por intersecciones, movimientos de giro y complejidad vial fueron extraídos de estudios de la [Federal Highway Administration (FHWA)](https://ops.fhwa.dot.gov/publications/fhwahop08024/chapter3.htm), [Transportation Research Part B](https://doi.org/10.1016/0191-2615(96)00001-X) y la [American Society of Civil Engineers (ASCE)](https://doi.org/10.1061/9780784483053.224).
