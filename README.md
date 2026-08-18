@@ -2,8 +2,8 @@
 
 Este proyecto analiza la red vial de La Estrella, Antioquia, con datos de OpenStreetMap y calcula rutas mediante una implementación propia del algoritmo A*.
 
-- `Waze_IA.ipynb` implementa A* directamente en las clases `OSMRouteMap` y `CompositeOSMRouteMap`.
-- `WAZE_IA_CORRECCION.ipynb` adapta la misma búsqueda a la estructura de `Node` y `Tree`, mediante `OSMRouteNode` y `OSMRouteTree`.
+- `WAZE_IA_CORRECCION.ipynb` es la versión principal. Implementa la búsqueda con la estructura de `Node` y `Tree`: `OSMRouteNode` adapta cada estado a la red vial, calcula costos y heurísticas y conserva su nodo padre, mientras `OSMRouteTree` utiliza el algoritmo A* heredado de `Tree` para encontrar la mejor ruta.
+- `Waze_IA.ipynb` realiza la misma búsqueda y utiliza el mismo modelo de costos, pero implementa A* directamente en `OSMRouteMap` y `CompositeOSMRouteMap`. En lugar de objetos enlazados mediante padres, administra los mejores costos y la reconstrucción de la ruta con los diccionarios `g_score` y `came_from`.
 
 El entorno se administra con [uv](https://docs.astral.sh/uv/). El proyecto está fijado a Python 3.11 y las versiones reproducibles de las dependencias se encuentran en `uv.lock`.
 
